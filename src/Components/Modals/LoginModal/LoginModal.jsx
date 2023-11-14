@@ -49,17 +49,20 @@ const LoginModal = () => {
     const [loginMessage, setLoginMessage] = useState("");
 
     /** To store the email validation message */
-    const [emailError, setEmailError] = useState("");
+    const [emailErrorClass, setEmailErrorClass] = useState("");
 
     /** User email id validation */
     useEffect(() => {
         /** RFC 2822 standard email validation regualr expression string */
         if (email !== "") {
             // eslint-disable-next-line
-            var mailFormat = /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/;
+            var mailFormat =
+                /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/;
             email.match(mailFormat)
-                ? setEmailError("")
-                : setEmailError("Invalid Email");
+                ? setEmailErrorClass("")
+                : setEmailErrorClass("error");
+        } else {
+            setEmailErrorClass("");
         }
     }, [email]);
 
@@ -67,7 +70,7 @@ const LoginModal = () => {
     const handleLoginSubmit = async (e) => {
         e.preventDefault();
 
-        if (emailError !== "") {
+        if (emailErrorClass !== "") {
             setLoginMessage("Please enter a valid email");
             return;
         }
@@ -175,52 +178,40 @@ const LoginModal = () => {
     return (
         <div className="modal">
             <div className="modal_content">
-                <div className="heade"></div>
-                <Button className="close" onClick={() => handleModalClose()}>
+                <Button
+                    className="close-btn"
+                    onClick={() => handleModalClose()}
+                >
                     &times;
                 </Button>
+                <img src={defaultUserLogo} className="image" alt="dummy img" />
 
-                <div className="login">
-                    <img
-                        src={defaultUserLogo}
-                        alt="dummy img"
-                        className="image"
-                    />
-                    <form onSubmit={handleLoginSubmit}>
-                        <div className="control">
-                            <label>Email Id:</label>
+                <div className="form-content">
+                    <form className="login-form" onSubmit={handleLoginSubmit}>
+                        <div className="input-field email">
+                            <label>Email</label>
                             <input
                                 type="email"
                                 name="email"
                                 value={email}
+                                className={emailErrorClass}
                                 onChange={(e) => setEmail(e.target.value)}
-                                required
+                                required={true}
                             />
-                            <br />
-                            <br />
-                            {emailError && (
-                                <>
-                                    <br />
-                                    <div className="errorContainer">
-                                        {emailError}
-                                    </div>
-                                </>
-                            )}
-                            <br />
-
-                            <label>Password:</label>
+                        </div>
+                        <div className="input-field password">
+                            <label>Password</label>
                             <input
                                 type="password"
                                 name="password"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                required
+                                required={true}
                             />
                         </div>
 
-                        <div className="checkbox">
-                            <label>Is Admin:</label>
-                            <br />
+                        <div className="input-field checkbox">
+                            <label>Login as Administrator</label>
                             <input
                                 type="checkbox"
                                 name="isAdmin"
@@ -229,24 +220,17 @@ const LoginModal = () => {
                                 onChange={(e) => setIsAdmin(e.target.checked)}
                             />
                         </div>
-                        <br />
-                        <br />
-                        <Button className="actions" type="submit">
+                        <Button className="login-btn" type="submit">
                             Login
                         </Button>
                     </form>
+
                     <div className="forgot-password">
-                        <Button
-                            type="button"
-                            onClick={() => handlePasswordReset()}
-                        >
-                            Forgot Password?
-                        </Button>
+                        <p onClick={() => handlePasswordReset()}>
+                            Forgot Password? <a href="#">Reset Now</a>
+                        </p>
                     </div>
-
                     <div className="message">{loginMessage}</div>
-
-                    <div className="footer"></div>
                 </div>
             </div>
         </div>
