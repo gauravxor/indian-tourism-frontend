@@ -5,7 +5,8 @@ import Button from "../../UI/Buttons/Button";
 import { defaultUserLogo } from "../../../fileUrls";
 
 import { AppContext } from "../../../AppContext.js";
-import "./LoginModal.css";
+
+import styles from "./LoginModal.module.css";
 
 const resendOtp = async (userEmail) => {
     const data = {
@@ -55,6 +56,7 @@ const LoginModal = () => {
     useEffect(() => {
         /** RFC 2822 standard email validation regualr expression string */
         if (email !== "") {
+            console.log("Email = " + email);
             // eslint-disable-next-line
             var mailFormat =
                 /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/;
@@ -174,32 +176,38 @@ const LoginModal = () => {
             isLoginModalOpen: false,
         });
     };
-
     return (
-        <div className="modal">
-            <div className="modal_content">
+        <div className={styles.modal}>
+            <div className={styles.modal_content}>
                 <Button
-                    className="close-btn"
+                    className={styles.close_btn}
                     onClick={() => handleModalClose()}
                 >
                     &times;
                 </Button>
-                <img src={defaultUserLogo} className="image" alt="dummy img" />
+                <img
+                    src={defaultUserLogo}
+                    className={styles.login_image}
+                    alt="dummy img"
+                />
 
-                <div className="form-content">
-                    <form className="login-form" onSubmit={handleLoginSubmit}>
-                        <div className="input-field email">
+                <div className={styles.form_content}>
+                    <form
+                        className={styles.login_form}
+                        onSubmit={handleLoginSubmit}
+                    >
+                        <div className={styles.input_field}>
                             <label>Email</label>
                             <input
                                 type="email"
                                 name="email"
                                 value={email}
-                                className={emailErrorClass}
+                                className={emailErrorClass ? styles.error : ""}
                                 onChange={(e) => setEmail(e.target.value)}
                                 required={true}
                             />
                         </div>
-                        <div className="input-field password">
+                        <div className={styles.input_field}>
                             <label>Password</label>
                             <input
                                 type="password"
@@ -210,12 +218,13 @@ const LoginModal = () => {
                             />
                         </div>
 
-                        <div className="input-field checkbox">
+                        <div
+                            className={`${styles.input_field} ${styles.checkbox}`}
+                        >
                             <label>Login as Administrator</label>
                             <input
                                 type="checkbox"
                                 name="isAdmin"
-                                className="isadmin"
                                 value={isAdmin}
                                 onChange={(e) => setIsAdmin(e.target.checked)}
                             />
@@ -225,12 +234,12 @@ const LoginModal = () => {
                         </Button>
                     </form>
 
-                    <div className="forgot-password">
+                    <div className={styles.forgot_password}>
                         <p onClick={() => handlePasswordReset()}>
                             Forgot Password? <a href="#">Reset Now</a>
                         </p>
                     </div>
-                    <div className="message">{loginMessage}</div>
+                    <div className={styles.message}>{loginMessage}</div>
                 </div>
             </div>
         </div>
