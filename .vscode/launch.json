@@ -1,17 +1,13 @@
 {
-	"configurations":
-	[
-		{
-			"type": "firefox",
-			"request": "launch",
-			"name": "Launch my cool app",
-			"url": "http://localhost:3000",
-			"pathMappings": [
-				{
-					"url": "file:///home/chiku/indian-tourism/client/src",
-					"path": "${workspaceFolder}/client/src"
-				}
-			]
-		}
-	]
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "chrome",
+            "name": "Debug using Brave",
+            "runtimeExecutable": "C:/Program Files/BraveSoftware/Brave-Browser/Application/brave.exe",
+            "request": "launch",
+            "url": "http://localhost:3000",
+            "webRoot": "${workspaceFolder}"
+        }
+    ]
 }

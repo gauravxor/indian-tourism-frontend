@@ -1,4 +1,4 @@
-.main_container{
+.main_container {
     display: flex;
     margin: auto;
     width: 50%;
@@ -7,16 +7,16 @@
     border-radius: 10px;
 }
 
-.main_container h2{
+.main_container h2 {
     color: rgb(50, 67, 78);
     float: left;
     margin: auto;
 }
-.main_container form  input{
+.main_container form input {
     /* width: 50%; */
     background-color: rgb(249, 249, 207);
 }
-label{
+label {
     width: 25%;
     color: black;
 }
@@ -35,20 +35,19 @@ label{
 } */
 
 @media only screen and (min-width: 601px) and (max-width: 1320px) {
-	label{
+    label {
         width: 35%;
     }
-    input{
+    input {
         width: 60%;
     }
 }
 
 @media only screen and (min-width: 1321px) and (max-width: 1920px) {
-	label{
+    label {
         width: 25%;
     }
-    input{
+    input {
         width: 20%;
     }
 }
-

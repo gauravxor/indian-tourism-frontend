@@ -1,184 +1,178 @@
 import React, { useState, useContext, useEffect } from "react";
 import axios from "axios";
 
-import Button		from "../../UI/Buttons/Button";
-import {AppContext}	from '../../../AppContext.js'
+import Button from "../../UI/Buttons/Button";
+import { AppContext } from "../../../AppContext.js";
 
-import "./OtpModal.css";
+import styles from "./OtpModal.module.css";
 
 const OtpModal = () => {
+    const { context, setContext } = useContext(AppContext);
 
-	const { context, setContext, resetContext } = useContext(AppContext);
+    /** To store the OTP entered by user */
+    const [otp, setOtp] = useState("");
 
-	/** To store the OTP entered by user */
-	const [otp, setOtp] = useState("");
+    /** To store the OTP expiry timer value */
+    const [timer, setTimer] = useState(120);
 
-	/** To store the OTP expiry timer value */
-	const [timer, setTimer] = useState(120);
+    /** To store the verification message to be displayed to user */
+    const [infoMessage, setInfoMessage] = useState("");
 
-	/** To store the verification message to be displayed to user */
-	const [verificationMsg, setVerificationMsg] = useState("");
+    const [actionBtnText, setActionButtonText] = useState("Submit OTP");
 
-	/** Function to handle things when user clicks the SUBMIT button in OTP form */
-	const handleVerifySubmit = async (e)	 => {
-		e.preventDefault();
+    const [isSubmitDisabled, setIsSubmitDisabled] = useState(false);
 
-		const data = {
-			email: context.userEmail,
-			otp: otp,
-			otpType: "emailVerification"
-		};
+    /** Function to handle OTP modal close button click */
+    const handleModalClose = () => {
+        if (context.isVerified === true) {
+            console.log("OTP Modal Closed");
+            setContext({ ...context, isOtpModalOpen: false });
+        } else {
+            console.log("First verify the email id");
+            setInfoMessage("First verify the email id");
+        }
+    };
 
-		try {
-			const url = `${window.location.protocol}//${window.location.hostname}:4000/api/auth/verify-otp`;
-			const response = await axios.post(url, data)
-			if(response.data.status === "failure" && response.data.msg === "Tokens Expired"){
-				alert("Session Expired. Please Login Again");
-				resetContext();
-			}
-			else
-			if(response.data.status === "success"){
-				setVerificationMsg("Email verified successfully");
+    /** Function to handle things when user clicks the SUBMIT button in OTP form */
+    const handleFormSubmit = async (e) => {
+        e.preventDefault();
+        setIsSubmitDisabled(true);
 
-				/** Wait for 2 seconds and then close the OTP modal */
-				setTimeout(() => {
-					setContext({...context, isLoggedIn: true, isLoginModalOpen: false,
-						isOtpModalOpen: false, isVerified: true, isUserAdmin: false});
-				}, 2000);
-			}
-			else{
-				setVerificationMsg("Invalid OTP or OTP expired");
-				console.log("Invalid OTP or OTP expired");
-			}
-		}
-		catch (error) {
-			const response = error.response.data;
-			if(response.msg === "User not logged in"){
-				console.log("User not logged in");
-				resetContext();
-				alert("Session Expired. Please Login Again!");
-			}
-			else
-			if(response.msg === "Duplicate session"){
-				console.log("Duplicate session");
-				resetContext();
-				alert("Duplicate session. Please Login Again!");
-			}
-			else{
-				console.log("Invalid OTP or OTP expired");
-			}
-		}
-	};
+        /** If submit button is clicked when the OTP has expired */
+        if (timer === 0) {
+            resendOtp();
+            return;
+        }
+        const data = {
+            email: context.userEmail,
+            otp: otp,
+            otpType: "emailVerification",
+        };
 
-	/** Function to handle OTP modal close button click */
-	const handleModalClose = () => {
-		if(context.isVerified === true){
-			console.log("OTP Modal Closed")
-			setContext({...context, isOtpModalOpen: false});
-		}
-		else{
-			console.log("First verify the email id");
-			setVerificationMsg("First verify the email id");
-		}
-	};
+        try {
+            const url = `${window.location.protocol}//${window.location.hostname}:4000/api/auth/verify-otp`;
+            const response = await axios.post(url, data);
+            if (response.data.code === 200) {
+                console.log("OTP verified")
+                setInfoMessage("Email verified");
+                setIsSubmitDisabled(false);
 
-	const handleResendOtp = async () => {
-		const data = {
-			email: context.userEmail,
-			otpType: "emailVerification"
-		};
+                /** Set the refresh token */
+                const refreshToken = response.data.data.refreshToken;
+                localStorage.setItem("refreshToken", refreshToken);
 
-		try {
-			const url = `${window.location.protocol}//${window.location.hostname}:4000/api/auth/resend-otp`;
-			const response = await axios.post(url, data);
-			if(response.data.status === "failure" && response.data.msg === "Tokens Expired"){
-				alert("Session Expired. Please Login Again");
-				resetContext();
-			}
-			else
-			if (response.data.status === "success") {
-				setVerificationMsg("New OTP sent");
-				setTimer(120); // Set the timer to 2 minutes
-			}
-		}
-		catch (error) {
-			const response = error.response.data;
-			if(response.msg === "User not logged in"){
-				console.log("User not logged in");
-				resetContext();
-				alert("Session Expired. Please Login Again!");
-			}
-			else
-			if(response.msg === "Duplicate session"){
-				console.log("Duplicate session");
-				resetContext();
-				alert("Duplicate session. Please Login Again!");
-			}
-			else{
-				console.log(error);
-			}
-		}
-	};
+                /** Wait for 2 seconds and then close the OTP modal */
+                setTimeout(() => {
+                    setContext({
+                        ...context,
+                        isLoggedIn: true,
+                        isLoginModalOpen: false,
+                        isOtpModalOpen: false,
+                        isVerified: true,
+                        isUserAdmin: false,
+                    });
+                }, 2000);
+            }
+        } catch (error) {
+            const errorMessage = error.response.data.error.message;
+            setInfoMessage(errorMessage.toUpperCase());
+            setIsSubmitDisabled(false);
+        }
+    };
 
-	/** Function to handle the OTP expiry timer */
-	const handleCountdown = () => {
+    const resendOtp = async () => {
+        const data = {
+            email: context.userEmail,
+            otpType: "emailVerification",
+        };
+        const url = `${window.location.protocol}//${window.location.hostname}:4000/api/auth/resend-otp`;
 
-	/** Decrease timer count by 1, each second */
-		if (timer > 0) {
-			setTimeout(() => {
-				setTimer(timer - 1);
-			}, 1000);
-		}
-	};
+        try {
+            const response = await axios.post(url, data);
+            if (response.data.code === 200) {
+                setInfoMessage("New OTP sent");
+                setTimer(120);
+                setIsSubmitDisabled(false);
+                setActionButtonText("Submit OTP");
+            }
+        } catch (error) {
+            setInfoMessage(error.response.data.error.message.toUpperCase());
+            setIsSubmitDisabled(false);
+        }
+    };
 
-	useEffect(() => {
-		handleCountdown();
-	}, [timer]); // eslint-disable-line
+    /** Function to handle the OTP expiry timer */
+    const handleCountdown = () => {
+        if (timer > 0) {
+            const interval = setTimeout(() => {
+                setTimer(timer - 1);
+            }, 1000);
+            return () => clearInterval(interval);
+        } else {
+            setActionButtonText("Resend OTP");
+        }
+    };
 
-	/** Clear the verification message after 2 seconds */
-	useEffect(() => {
-		if(verificationMsg !== ""){
-			setTimeout(() => {
-				setVerificationMsg("");
-			}, 2000);
-		}
-	}, [verificationMsg]);
+    useEffect(() => {
+        handleCountdown();
+    }, [timer]); // eslint-disable-line
 
+    /** Clear the verification message after 2 seconds */
+    useEffect(() => {
+        if (infoMessage !== "") {
+            const interval = setInterval(() => {
+                setInfoMessage("");
+            }, 2000);
+            return () => clearInterval(interval);
+        }
+    }, [infoMessage]);
 
-	return (
-		<div className="modal_2">
-			<div className="modal-_content">
-				<Button className="close-btn" onClick={() => handleModalClose()}>&times;</Button>
-				<h2>Verify Email Address</h2>
+    return (
+        <div className={styles.modal}>
+            <div className={styles.modal_content}>
+                <div className={styles.modal_header}>
+                    <h1 className={styles.modal_header_text}>Verify Email</h1>
+                    <Button
+                        className={styles.close_btn}
+                        onClick={() => handleModalClose()}
+                    >
+                        &times;
+                    </Button>
+                </div>
 
-				<form onSubmit={handleVerifySubmit}>
-					<label>OTP : </label>
-					<input
-						type="text"
-						name="otp"
-						placeholder="Enter OTP"
-						value={otp}
-						onChange={(e) => setOtp(e.target.value)}
-						required
-					/>
-					<br/>
-					<Button type="submit">Verify</Button>
-				</form>
-
-				{/* Enable OTP resend button when OTP timer expires*/}
-				<div className="resend">
-					{timer === 0 ? (
-						<Button type="submit" onClick={handleResendOtp}>Resend OTP</Button>
-					) : (
-						<p>Resend OTP in {timer} seconds</p>
-					)}
-				</div>
-
-				<div>
-					<h1> {verificationMsg} </h1>
-				</div>
-			</div>
-		</div>
-	);
+                <form className={styles.otp_form} onSubmit={handleFormSubmit}>
+                    <div className={styles.input_field}>
+                        <label htmlFor="otp">
+                            Enter OTP sent to your email
+                        </label>
+                        <input
+                            type="text"
+                            id="otp"
+                            name="otp"
+                            placeholder={
+                                timer !== 0
+                                    ? `OTP Expires in  ${timer}`
+                                    : "OTP expired"
+                            }
+                            value={timer !== 0 ? otp : ""}
+                            onChange={(e) => setOtp(e.target.value)}
+                            required={true}
+                            disabled={timer === 0 ? true : false}
+                        />
+                    </div>
+                    <Button
+                        type="submit"
+                        className={styles.action_btn}
+                        disabled={isSubmitDisabled}
+                    >
+                        {actionBtnText}
+                    </Button>
+                </form>
+                <div className={styles.modal_footer}>
+                    <p> {infoMessage} </p>
+                </div>
+            </div>
+        </div>
+    );
 };
 export default OtpModal;

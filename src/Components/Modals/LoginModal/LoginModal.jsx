@@ -2,40 +2,28 @@ import React, { useState, useContext, useEffect } from "react";
 import axios from "axios";
 
 import Button from "../../UI/Buttons/Button";
-import { defaultUserLogo } from "../../../fileUrls";
-
-import { AppContext } from "../../../AppContext.js";
-
 import styles from "./LoginModal.module.css";
 
-const resendOtp = async (userEmail) => {
+import { defaultUserLogo } from "../../../fileUrls";
+import { AppContext } from "../../../AppContext.js";
+
+async function sendEmailVerificationOtp(userEmail) {
     const data = {
         email: userEmail,
         otpType: "emailVerification",
     };
-    console.log(data);
 
     try {
         const url = `${window.location.protocol}//${window.location.hostname}:4000/api/auth/resend-otp`;
         const response = await axios.post(url, data);
-        console.log(response.data);
-        return response.data.status;
+        return response.data.code;
     } catch (error) {
-        const response = error.response.data;
-        if (response.msg === "User not logged in") {
-            console.log("User not logged in");
-            alert("Session Expired. Please Login Again!");
-        } else if (response.msg === "Duplicate session") {
-            console.log("Duplicate session");
-            alert("Duplicate session. Please Login Again!");
-        } else {
-            console.log(error);
-        }
+        return error.response.data.code;
     }
-};
+}
 
 const LoginModal = () => {
-    const { context, setContext, resetContext } = useContext(AppContext);
+    const { context, setContext } = useContext(AppContext);
 
     /** To store the user login email id */
     const [email, setEmail] = useState("");
@@ -56,11 +44,10 @@ const LoginModal = () => {
     useEffect(() => {
         /** RFC 2822 standard email validation regualr expression string */
         if (email !== "") {
-            console.log("Email = " + email);
             // eslint-disable-next-line
-            var mailFormat =
+            var mailRegex =
                 /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/;
-            email.match(mailFormat)
+            email.match(mailRegex)
                 ? setEmailErrorClass("")
                 : setEmailErrorClass("error");
         } else {
@@ -77,6 +64,7 @@ const LoginModal = () => {
             return;
         }
 
+        /** Request body data */
         const data = {
             email: email,
             password: password,
@@ -86,14 +74,12 @@ const LoginModal = () => {
         try {
             const url = `${window.location.protocol}//${window.location.hostname}:4000/api/auth/login`;
             const response = await axios.post(url, data);
-            if (
-                response.data.status === "failure" &&
-                response.data.msg === "Tokens Expired"
-            ) {
-                alert("Session Expired. Please Login Again");
-                resetContext();
-            } else if (response.data.status === "success") {
+            if (response.status === 200) {
                 setLoginMessage("Login Successful");
+
+                /** Store the refresh token */
+                const refreshToken = response.data.data.refreshToken;
+                localStorage.setItem("refreshToken", refreshToken);
 
                 /** Wait for 2 seconds and then close the login modal */
                 setTimeout(() => {
@@ -103,73 +89,36 @@ const LoginModal = () => {
                         isLoginModalOpen: false,
                         isUserAdmin: isAdmin,
                         userEmail: email,
-                        userId: response.data.userId,
+                        userId: response.data.data.userId,
                     });
                 }, 2000);
-            } /** If the user is having a duplicate session */ else if (
-                response.data.msg === "Duplicate Session"
-            ) {
-                setLoginMessage(
-                    "Existing session found. Please Logout to continue."
-                );
-
-                setTimeout(() => {
-                    setContext({
-                        ...context,
-                        isLoggedIn: true,
-                        isLoginModalOpen: false,
-                        isUserAdmin: isAdmin,
-                        userEmail: email,
-                        userId: response.data.userId,
-                    });
-                }, 2000);
-            } /** If the user has not verified the email yet */ else if (
-                response.data.msg === "Email not verified"
-            ) {
-                setLoginMessage(
-                    "Email not verified. Please verify your email to continue."
-                );
-                const isOtpResent = await resendOtp(email);
-                if (isOtpResent === "success") {
-                    console.log("OTP resent successfully");
-                    console.log("User id is: " + JSON.stringify(response.data));
+            } else if (response.status === 202) {
+                setLoginMessage("Please verify your email id first");
+                const status = await sendEmailVerificationOtp(email);
+                if (status === 200) {
+                    console.log("Email verification OTP sent");
                     setContext({
                         ...context,
                         isLoggedIn: false,
                         isUserAdmin: isAdmin,
                         userEmail: email,
-                        userId: response.data.userId,
+                        userId: response.data.data.userId,
                         isOtpModalOpen: true,
                         isLoginModalOpen: false,
                     });
                 }
-            } else {
-                setLoginMessage("Invalid Credentials or user does not exist");
             }
         } catch (error) {
-            const response = error.response.data;
-            if (response.msg === "User not logged in") {
-                console.log("User not logged in");
-                resetContext();
-                alert("Session Expired. Please Login Again!");
-            } else if (response.msg === "Duplicate session") {
-                console.log("Duplicate session");
-                resetContext();
-                alert("Duplicate session. Please Login Again!");
-            } else {
-                console.log("Error in login");
-                setLoginMessage("Invalid Credentials or user does not exist");
-            }
+            const errorMessage = error.response.data.error.message;
+            setLoginMessage(errorMessage.toUpperCase());
         }
     };
 
     const handleModalClose = () => {
-        console.log("Login Modal Closed");
         setContext({ ...context, isLoginModalOpen: false });
     };
 
     const handlePasswordReset = () => {
-        console.log("Password Reset Clicked");
         setContext({
             ...context,
             isForgotPasswordModalOpen: true,
@@ -236,7 +185,8 @@ const LoginModal = () => {
 
                     <div className={styles.forgot_password}>
                         <p onClick={() => handlePasswordReset()}>
-                            Forgot Password? <a href="#">Reset Now</a>
+                            {/*eslint-disable-next-line*/}
+                            Forgot Password? <a href="#">Reset Now</a>{" "}
                         </p>
                     </div>
                     <div className={styles.message}>{loginMessage}</div>

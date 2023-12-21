@@ -21,3 +21,10 @@
     box-shadow: rgba(45, 35, 66, 0.4) 0 4px 8px,
         rgba(45, 35, 66, 0.3) 0 7px 13px -3px, #ffffff68 0 -3px 0 inset;
 }
+
+.button:disabled {
+    background-color: rgb(255, 255, 255);
+    color: rgb(0, 0, 0);
+    border: 1px solid rgb(0, 0, 0);
+    cursor: not-allowed;
+}

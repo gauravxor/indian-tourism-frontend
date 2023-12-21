@@ -1,50 +1,32 @@
 import axios from "axios";
-import React, { useState, useEffect, useContext } from "react";
-import "./LocationDataEdit.css";
+import React, { useState, useEffect } from "react";
+import styles from "./LocationDataEdit.module.css";
 import Button from "../../../UI/Buttons/Button";
-import { AppContext } from "../../../../AppContext";
 const UserProfileEdit = (props) => {
     /** Saving the location id received from props */
     const locationId = props.locationId;
 
     const [locationData, setLocationData] = useState({});
-    // eslint-disable-next-line
-    const { context, setContext, resetContext } = useContext(AppContext);
 
     useEffect(() => {
-        const url =
-            `${window.location.protocol}//${window.location.hostname}:4000/api/location/` +
-            locationId;
-
-        axios
-            .get(url, { withCredentials: true })
-            .then((response) => {
-                if (
-                    response.data.status === "failure" &&
-                    response.data.msg === "Tokens Expired"
-                ) {
-                    alert("Session Expired. Please Login Again");
-                    resetContext();
-                } else if (response.data.status === "success") {
-                    console.log("Fetched location details");
-                    setLocationData(response.data.location);
-                }
-            })
-            .catch((error) => {
-                const response = error.response.data;
-                if (response.msg === "User not logged in") {
-                    console.log("User not logged in");
-                    resetContext();
-                    alert("Session Expired. Please Login Again!");
-                } else if (response.msg === "Duplicate session") {
-                    console.log("Duplicate session");
-                    resetContext();
-                    alert("Duplicate session. Please Login Again!");
-                } else {
-                    console.log("Error fetching location details");
-                }
-            });
-    }, []); // eslint-disable-line
+        /** Fetching the location details from the API */
+        async function fetchLocationDetails() {
+            const url =
+                `${window.location.protocol}//${window.location.hostname}:4000/api/location/` +
+                locationId;
+            try {
+                const response = await axios.get(url, {
+                    withCredentials: true,
+                });
+                console.log("Fetched location details");
+                setLocationData(response.data.data.locations);
+            } catch (error) {
+                console.log(error);
+                console.log(error.response.data.error.message.toUpperCase());
+            }
+        }
+        fetchLocationDetails();
+    }, [locationId]);
 
     /** React states to store the location details */
     const [locationName, setLocationName] = useState("");
@@ -122,33 +104,19 @@ const UserProfileEdit = (props) => {
                 },
                 withCredentials: true,
             });
-
-            if (response.data.status === "success") {
+            if (response.data.code === 200) {
                 alert("Location Updated Successfully");
-            } else {
-                alert("Location Update Failed");
             }
         } catch (error) {
-            const response = error.response.data;
-            if (response.msg === "User not logged in") {
-                console.log("User not logged in");
-                resetContext();
-                alert("Session Expired. Please Login Again!");
-            } else if (response.msg === "Duplicate session") {
-                console.log("Duplicate session");
-                resetContext();
-                alert("Duplicate session. Please Login Again!");
-            } else {
-                alert("Location Update Failed");
-            }
+            alert(error.response.data.error.message.toUpperCase());
         }
     };
 
     return (
         <>
-            <div className="location-edit-info">
+            <div className={styles.location_edit_info}>
                 <h2>Edit Location</h2>
-                <form className="location-data-edit">
+                <form className={styles.location_data_edit}>
                     <div>
                         <label htmlFor="location-name">Location Name</label>
                         <input
@@ -163,10 +131,10 @@ const UserProfileEdit = (props) => {
                     </div>
                     <div>
                         <label htmlFor="location-description">
-                            Location Description
+                            Description
                         </label>
                         <textarea
-                            className="loc-desc"
+                            className={styles.loc_desc}
                             type="text"
                             id="location-description"
                             name="location-description"
@@ -177,9 +145,7 @@ const UserProfileEdit = (props) => {
                         />
                     </div>
                     <div>
-                        <label htmlFor="location-address">
-                            Location Address
-                        </label>
+                        <label htmlFor="location-address">Address</label>
                         <input
                             type="text"
                             id="location-address"
@@ -191,7 +157,7 @@ const UserProfileEdit = (props) => {
                         />
                     </div>
                     <div>
-                        <label htmlFor="location-city">Location City</label>
+                        <label htmlFor="location-city">City</label>
                         <input
                             type="text"
                             id="location-city"
@@ -203,7 +169,7 @@ const UserProfileEdit = (props) => {
                         />
                     </div>
                     <div>
-                        <label htmlFor="location-state">Location State</label>
+                        <label htmlFor="location-state">State</label>
                         <input
                             type="text"
                             id="location-state"
@@ -215,9 +181,7 @@ const UserProfileEdit = (props) => {
                         />
                     </div>
                     <div>
-                        <label htmlFor="location-country">
-                            Location Country
-                        </label>
+                        <label htmlFor="location-country">Country</label>
                         <input
                             type="text"
                             id="location-country"
@@ -229,9 +193,7 @@ const UserProfileEdit = (props) => {
                         />
                     </div>
                     <div>
-                        <label htmlFor="location-pincode">
-                            Location Pincode
-                        </label>
+                        <label htmlFor="location-pincode">Pincode</label>
                         <input
                             type="text"
                             id="location-pincode"
@@ -243,9 +205,7 @@ const UserProfileEdit = (props) => {
                         />
                     </div>
                     <div>
-                        <label htmlFor="location-longitude">
-                            Location Longitude
-                        </label>
+                        <label htmlFor="location-longitude">Longitude</label>
                         <input
                             type="text"
                             id="location-longitude"
@@ -257,9 +217,7 @@ const UserProfileEdit = (props) => {
                         />
                     </div>
                     <div>
-                        <label htmlFor="location-latitude">
-                            Location Latitude
-                        </label>
+                        <label htmlFor="location-latitude">Latitude</label>
                         <input
                             type="text"
                             id="location-latitude"
@@ -271,9 +229,7 @@ const UserProfileEdit = (props) => {
                         />
                     </div>
                     <div>
-                        <label htmlFor="location-capacity">
-                            Location Capacity
-                        </label>
+                        <label htmlFor="location-capacity">Capacity</label>
                         <input
                             type="text"
                             id="location-capacity"
@@ -285,7 +241,7 @@ const UserProfileEdit = (props) => {
                         />
                     </div>
                     <div>
-                        <label htmlFor="location-price">Location Price</label>
+                        <label htmlFor="location-price">Price</label>
                         <input
                             type="text"
                             id="location-price"
@@ -298,7 +254,7 @@ const UserProfileEdit = (props) => {
                     </div>
                     <div>
                         <label htmlFor="location-cover-image-1">
-                            Location Cover Image 1
+                            Cover Image 1
                         </label>
                         <input
                             type="file"
@@ -311,7 +267,7 @@ const UserProfileEdit = (props) => {
                     </div>
                     <div>
                         <label htmlFor="location-cover-image-2">
-                            Location Cover Image 2
+                            Cover Image 2
                         </label>
                         <input
                             type="file"
@@ -324,7 +280,7 @@ const UserProfileEdit = (props) => {
                     </div>
                     <div>
                         <label htmlFor="location-cover-image-3">
-                            Location Cover Image 3
+                            Cover Image 3
                         </label>
                         <input
                             type="file"
@@ -337,7 +293,7 @@ const UserProfileEdit = (props) => {
                     </div>
                     <div>
                         <label htmlFor="location-slider-image-1">
-                            Location Slider Image 1
+                            Slider Image 1
                         </label>
                         <input
                             type="file"
@@ -350,7 +306,7 @@ const UserProfileEdit = (props) => {
                     </div>
                     <div>
                         <label htmlFor="location-slider-image-2">
-                            Location Slider Image 2
+                            Slider Image 2
                         </label>
                         <input
                             type="file"
@@ -363,7 +319,7 @@ const UserProfileEdit = (props) => {
                     </div>
                     <div>
                         <label htmlFor="location-slider-image-3">
-                            Location Slider Image 3
+                            Slider Image 3
                         </label>
                         <input
                             type="file"
@@ -374,15 +330,15 @@ const UserProfileEdit = (props) => {
                             }
                         />
                     </div>
-                    <div className="buttons">
+                    <div className={styles.buttons}>
                         <Button
-                            className="btn1"
+                            className={styles.btn1}
                             onClick={() => props.setInEditableMode(false)}
                         >
                             Back
                         </Button>
                         <Button
-                            className="btn2"
+                            className={styles.btn2}
                             onClick={(event) => handleSave(event)}
                         >
                             Save
@@ -392,7 +348,7 @@ const UserProfileEdit = (props) => {
             </div>
 
             {/* If user clicks the edit button, the inEditableMode state will be changed in parent component and
-				location edit form component will be rendered */}
+            location edit form component will be rendered */}
         </>
     );
 };

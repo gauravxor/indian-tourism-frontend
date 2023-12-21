@@ -1,6 +1,6 @@
-import React, {useContext} from 'react';
+import React, { useContext, useEffect } from 'react';
 import { Route, Routes, useLocation } from 'react-router-dom';
-import {AppContext} 			from './AppContext';
+import { AppContext } from './AppContext';
 
 import classes from './App.module.css'
 import Header from './Components/Header/Header.jsx';
@@ -14,42 +14,63 @@ import LocationsContainer from './Components/Body/Locations/LocationsContainer/L
 import AddLocationContainer from './Components/Body/Locations/AddLocationContainer/AddLocationContainer.jsx';
 import CancellationContainer from './Components/Body/Cancellation/CancellationContainer/CancellationContainer.jsx';
 import About from './Components/Body/About/About';
+import refreshAccessToken from './utils/refreshAccessToken.js';
+
 
 function App() {
-	// eslint-disable-next-line
-	const {context, setContext} = useContext(AppContext);
 
-	const {isSlideShow} = context;
+    const { context, resetContext } = useContext(AppContext);
 
-	/** Using useLocation hook to determine the current route/path and render components accordingly */
-	const location = useLocation();
-	const isScannerRoute = location.pathname === '/scanner';
+    const { isSlideShow } = context;
 
-	return (
-	<div className={classes.App}>
-		{!isScannerRoute && <Header />}
-		{!isScannerRoute && !isSlideShow && (
-			<div className={classes.container}>
-				<ImageSlider slides={slides} parentWidth={700} />
-			</div>
-		)}
+    /** Using useLocation hook to determine the current route/path and render components accordingly */
+    const location = useLocation();
+    const isScannerRoute = location.pathname === '/scanner';
 
-		<div className={classes.body}>
-			<Routes>
-				<Route path="/" Component={LocationsContainer} />
-				<Route path="/profile" Component={Profile} />
-				<Route path="/bookings" Component={BookingsContainer} />
-				<Route path="/about" Component={About} />
-				<Route path="/locations" Component={LocationsContainer} />
-				<Route path="/locations/:locationId" Component={LocationBody} />
-				<Route path="/add-location/" Component={AddLocationContainer} />
-				<Route path="/cancellations" Component={CancellationContainer} />
-				<Route path="/scanner" Component={Scanner} />
-			</Routes>
-		</div>
+    useEffect(() => {
+        async function rotateTokens() {
+            const result = await refreshAccessToken();
+            if (!result) {
+                console.log("Failed to refresh access token");
+                resetContext();
+            } else {
+                console.log("Token refreshed")
+            }
+        }
 
-	</div>
-	);
+        if (context.isLoggedIn) {
+            const intervalId = setInterval(() => {
+                rotateTokens();
+            }, 10 * 1000);
+            return () => clearInterval(intervalId);
+        }
+    }, [context.isLoggedIn, resetContext]);
+
+    return (
+        <div className={classes.App}>
+            {!isScannerRoute && <Header />}
+            {!isScannerRoute && !isSlideShow && (
+                <div className={classes.container}>
+                    <ImageSlider slides={slides} parentWidth={700} />
+                </div>
+            )}
+
+            <div className={classes.body}>
+                <Routes>
+                    <Route path="/" Component={LocationsContainer} />
+                    <Route path="/profile" Component={Profile} />
+                    <Route path="/bookings" Component={BookingsContainer} />
+                    <Route path="/about" Component={About} />
+                    <Route path="/locations" Component={LocationsContainer} />
+                    <Route path="/locations/:locationId" Component={LocationBody} />
+                    <Route path="/add-location/" Component={AddLocationContainer} />
+                    <Route path="/cancellations" Component={CancellationContainer} />
+                    <Route path="/scanner" Component={Scanner} />
+                </Routes>
+            </div>
+
+        </div>
+    );
 }
 
 export default App;

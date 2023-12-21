@@ -34,46 +34,18 @@ const Header = () => {
     const handleLogoutClick = async () => {
         console.log("Logout Clicked");
 
-        /** Data to be sent to the server */
-        const data = {
-            userEmail: context.userEmail,
-        };
-
         try {
             const url = `${window.location.protocol}//${window.location.hostname}:4000/api/auth/logout`;
 
             /** Calling the Logout API */
-            const response = await axios.post(url, data, {
+            const response = await axios.post(url, {
                 withCredentials: true,
             });
-
-            if (
-                response.data.status === "failure" &&
-                response.data.msg === "Tokens Expired"
-            ) {
-                alert("Session Expired. Please Login Again");
+            if (response.status === 204) {
+                localStorage.removeItem("refreshToken");
                 resetContext();
-            } else if (response.data.status === "success") {
-                /** Since user is logging out, so reset the context variables */
-                resetContext();
-            } else {
-                console.log("Error logging out");
             }
-        } catch (error) {
-            console.log(error);
-            const response = error.response.data;
-            if (response.msg === "User not logged in") {
-                console.log("User not logged in");
-                resetContext();
-                alert("Session Expired. Please Login Again!");
-            } else if (response.msg === "Duplicate session") {
-                console.log("Duplicate session");
-                resetContext();
-                alert("Duplicate session. Please Login Again!");
-            } else {
-                console.log("Error logging out");
-            }
-        }
+        } catch (error) {}
     };
 
     /** Function to handle things when user clicks the SEARCH button */
