@@ -17,10 +17,7 @@ function ImageCarousel(props) {
             <div>
                 <img
                     className={styles.image}
-                    src={
-                        `http://localhost:4000` +
-                        props.imageData[imageIndex].urls
-                    }
+                    src={props.imageData[imageIndex].urls}
                     alt="location"
                 />
             </div>

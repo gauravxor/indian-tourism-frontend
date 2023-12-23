@@ -1,9 +1,9 @@
 const imageUrls = {
-    "gaurav": "https://i.imgur.com/l38nwER.jpg",
-    "kaushal": "https://i.imgur.com/o1JsaOu.jpg",
-    "rohit": "https://i.imgur.com/SFA0BAl.jpg",
-    "siteLogo": "https://i.imgur.com/SkhnYws.png",
-    "defaultUserLogo": "https://i.imgur.com/Dhu42vq.png"
+    "gaurav": "https://storage.googleapis.com/indian-tourism-684f2.appspot.com/assets/gaurav.jpg",
+    "kaushal": "https://storage.googleapis.com/indian-tourism-684f2.appspot.com/assets/kaushal.jpg",
+    "rohit": "https://storage.googleapis.com/indian-tourism-684f2.appspot.com/assets/rohit.jpg",
+    "siteLogo": "https://storage.googleapis.com/indian-tourism-684f2.appspot.com/assets/site_logo.png",
+    "defaultUserLogo": "https://storage.googleapis.com/indian-tourism-684f2.appspot.com/assets/login_icon.png"
 }
 export default imageUrls;
 

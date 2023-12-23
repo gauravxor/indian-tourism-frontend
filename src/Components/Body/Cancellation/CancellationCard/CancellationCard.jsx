@@ -7,7 +7,7 @@ const CancellationCard = (props) => {
     /** Storing the cancellationData object */
     const cancellationData = props.cancellationData;
 
-    const cancelApprovalHandler = () => {
+    const cancelApprovalHandler = async () => {
         console.log("Approve button clicked");
 
         const data = {
@@ -19,7 +19,10 @@ const CancellationCard = (props) => {
             const url = `${window.location.protocol}//${window.location.hostname}:4000/api/book/cancel/approve`;
 
             /** Calling the cancellation API to approve cancellation */
-            const response = axios.post(url, data, { withCredentials: true });
+            const response = await axios.post(url, data, {
+                withCredentials: true,
+            });
+            console.log(response);
             if (response.data.code === 200) {
                 alert("Cancellation Approved");
             }

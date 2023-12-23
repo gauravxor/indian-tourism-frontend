@@ -52,10 +52,7 @@ const Card = (props) => {
                 <div className={styles.location_card}>
                     <div className={styles.image_section}>
                         <img
-                            src={
-                                `${window.location.protocol}//${window.location.hostname}:4000` +
-                                images[currentImage].urls
-                            }
+                            src={images[currentImage].urls}
                             alt={images[currentImage].imageType}
                         />
                         {images.length > 1 && (

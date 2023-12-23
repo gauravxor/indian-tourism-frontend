@@ -59,9 +59,6 @@ const UserProfile = () => {
                 if (userData === "unauthorized") {
                     resetContext();
                 } else {
-                    if (!userData.userImageURL.includes("imgur")) {
-                        userData.userImageURL = `${window.location.protocol}//${window.location.hostname}:4000${userData.userImageURL}`;
-                    }
                     setUserDetails(userData);
                 }
             });
