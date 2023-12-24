@@ -30,8 +30,10 @@ const ForgotPasswordModal = () => {
 
         const data = { email };
         try {
-            const url = `${window.location.protocol}//${window.location.hostname}:4000/api/auth/forgot-password`;
-            const response = await axios.post(url, data);
+            const url = `${process.env.REACT_APP_API_BASE_URL}/api/auth/forgot-password`;
+            const response = await axios.post(url, data, {
+                withCredentials: true,
+            });
             if (response.data.code === 200) {
                 setResetMessage("OTP sent to registered email");
                 /** Wait for 2 seconds before rendering the other component */
@@ -65,8 +67,10 @@ const ForgotPasswordModal = () => {
         };
 
         try {
-            const url = `${window.location.protocol}//${window.location.hostname}:4000/api/auth/verify-otp`;
-            const response = await axios.post(url, data);
+            const url = `${process.env.REACT_APP_API_BASE_URL}/api/auth/verify-otp`;
+            const response = await axios.post(url, data, {
+                withCredentials: true,
+            });
 
             if (response.data.code === 200) {
                 /** Setting the appropriate message to user's click action */
@@ -97,8 +101,10 @@ const ForgotPasswordModal = () => {
         };
 
         try {
-            const url = `${window.location.protocol}//${window.location.hostname}:4000/api/auth/change-password`;
-            const response = await axios.post(url, data);
+            const url = `${process.env.REACT_APP_API_BASE_URL}/api/auth/change-password`;
+            const response = await axios.post(url, data, {
+                withCredentials: true,
+            });
 
             if (response.data.code === 200) {
                 setResetMessage("Password reset successful. Login to continue");
@@ -128,8 +134,10 @@ const ForgotPasswordModal = () => {
         };
 
         try {
-            const url = `${window.location.protocol}//${window.location.hostname}:4000/api/auth/resend-otp`;
-            const response = await axios.post(url, data);
+            const url = `${process.env.REACT_APP_API_BASE_URL}/api/auth/resend-otp`;
+            const response = await axios.post(url, data, {
+                withCredentials: true,
+            });
 
             if (response.data.code === 200) {
                 setIsSubmitDisabled(false);

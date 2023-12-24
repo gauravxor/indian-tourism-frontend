@@ -34,13 +34,15 @@ const ScannerModal = (props) => {
     const [actionMessage, setActionMessage] = useState("");
 
     const handleButtonSubmit = async () => {
-        const url = `${window.location.protocol}//${window.location.hostname}:4000/scanner/allow`;
+        const url = `${process.env.REACT_APP_API_BASE_URL}/scanner/allow`;
         const data = {
             accessKey: props.token,
             bookingId: props.result.bookingId,
         };
         try {
-            const response = await axios.post(url, data);
+            const response = await axios.post(url, data, {
+                withCredentials: true,
+            });
             if (response.data.status === "success") {
                 setActionMessage("Entry Allowed");
                 setTimeout(() => {

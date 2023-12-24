@@ -49,7 +49,7 @@ const LocationBooking = (props) => {
         };
 
         try {
-            const url = `${window.location.protocol}//${window.location.hostname}:4000/api/book/lock/`;
+            const url = `${process.env.REACT_APP_API_BASE_URL}/api/book/lock/`;
             const response = await axios.post(url, data, {
                 withCredentials: true,
             });

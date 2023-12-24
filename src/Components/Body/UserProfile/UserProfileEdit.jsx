@@ -44,10 +44,11 @@ const UserProfileEdit = (props) => {
         data.append("pincode", pincode);
 
         try {
-            const url = `${window.location.protocol}//${window.location.hostname}:4000/api/update/user`;
+            const url = `${process.env.REACT_APP_API_BASE_URL}/api/update/user`;
 
             const response = await axios.post(url, data, {
                 headers: { "Content-Type": "multipart/form-data" },
+                withCredentials: true,
             });
             if (response.data.code === 200) {
                 alert("User details updated!");
@@ -70,7 +71,7 @@ const UserProfileEdit = (props) => {
                 <div className={styles.image_container}>
                     <div className={styles.image_field}>
                         <img
-                            src={`${window.location.protocol}//${window.location.hostname}:4000${userDetails.userImageURL}`}
+                            src={`${process.env.REACT_APP_API_BASE_URL}${userDetails.userImageURL}`}
                             alt="User-profile"
                         />
                         <input

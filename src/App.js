@@ -18,7 +18,6 @@ import refreshAccessToken from './utils/refreshAccessToken.js';
 
 
 function App() {
-
     const { context, resetContext } = useContext(AppContext);
 
     const { isSlideShow } = context;

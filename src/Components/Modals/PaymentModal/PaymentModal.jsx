@@ -52,7 +52,7 @@ const PaymentModal = () => {
      * temporary booking details and display it to the user for confirmation before making the payment
      */
     useEffect(() => {
-        const url = `${window.location.protocol}//${window.location.hostname}:4000/api/book/lock/details/${tempBookingId}`;
+        const url = `${process.env.REACT_APP_API_BASE_URL}/api/book/lock/details/${tempBookingId}`;
         axios
             .get(url, { withCredentials: true })
             .then((response) => {
@@ -77,7 +77,7 @@ const PaymentModal = () => {
         };
 
         try {
-            const url = `${window.location.protocol}//${window.location.hostname}:4000/api/book/final`;
+            const url = `${process.env.REACT_APP_API_BASE_URL}/api/book/final`;
             const response = await axios.post(url, data, {
                 withCredentials: true,
             });

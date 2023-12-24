@@ -32,7 +32,7 @@ const formatDate = (dateStr) => {
 };
 
 async function getUserData(userId) {
-    const url = `${window.location.protocol}//${window.location.hostname}:4000/api/user/details/${userId}`;
+    const url = `${process.env.REACT_APP_API_BASE_URL}/api/user/details/${userId}`;
     try {
         const response = await axios.get(url, { withCredentials: true });
         return response.data.data.userData;

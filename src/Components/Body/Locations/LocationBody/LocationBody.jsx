@@ -15,7 +15,7 @@ function LocationBody() {
     const { locationId } = useParams();
 
     useEffect(() => {
-        const url = `${window.location.protocol}//${window.location.hostname}:4000/api/location/${locationId}`;
+        const url = `${process.env.REACT_APP_API_BASE_URL}/api/location/${locationId}`;
         axios
             .get(url)
             .then((response) => {

@@ -24,12 +24,12 @@ function LocationsContainer() {
         let url = "";
         /** If search text is empty, call the API to get random locations or else get specific results */
         if (context.searchText === "") {
-            url = `${window.location.protocol}//${window.location.hostname}:4000/api/location`;
+            url = `${process.env.REACT_APP_API_BASE_URL}/api/location`;
         } else {
-            url = `${window.location.protocol}//${window.location.hostname}:4000/api/location/search/${context.searchText}`;
+            url = `${process.env.REACT_APP_API_BASE_URL}/api/location/search/${context.searchText}`;
         }
         axios
-            .get(url, { withCredentials: false })
+            .get(url, { withCredentials: true })
             .then((response) => {
                 if (response.data.data.locations.size === 0) {
                     /** The response will contain an array of objects. If the array is empty, we will render the main body

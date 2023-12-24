@@ -14,8 +14,8 @@ async function sendEmailVerificationOtp(userEmail) {
     };
 
     try {
-        const url = `${window.location.protocol}//${window.location.hostname}:4000/api/auth/resend-otp`;
-        const response = await axios.post(url, data);
+        const url = `${process.env.REACT_APP_API_BASE_URL}/api/auth/resend-otp`;
+        const response = await axios.post(url, data, { withCredentials: true });
         return response.data.code;
     } catch (error) {
         return error.response.data.code;
@@ -72,8 +72,10 @@ const LoginModal = () => {
         };
 
         try {
-            const url = `${window.location.protocol}//${window.location.hostname}:4000/api/auth/login`;
-            const response = await axios.post(url, data);
+            const url = `${process.env.REACT_APP_API_BASE_URL}/api/auth/login`;
+            const response = await axios.post(url, data, {
+                withCredentials: true,
+            });
             if (response.status === 200) {
                 setLoginMessage("Login Successful");
 

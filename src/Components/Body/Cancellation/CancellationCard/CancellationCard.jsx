@@ -16,7 +16,7 @@ const CancellationCard = (props) => {
         };
 
         try {
-            const url = `${window.location.protocol}//${window.location.hostname}:4000/api/book/cancel/approve`;
+            const url = `${process.env.REACT_APP_API_BASE_URL}/api/book/cancel/approve`;
 
             /** Calling the cancellation API to approve cancellation */
             const response = await axios.post(url, data, {

@@ -36,7 +36,7 @@ const BookingCard = (props) => {
         console.log("Sending cancellation request -> " + bookingId);
 
         try {
-            const url = `${window.location.protocol}//${window.location.hostname}:4000/api/book/cancel`;
+            const url = `${process.env.REACT_APP_API_BASE_URL}/api/book/cancel`;
             const data = {
                 bookingId: bookingId,
                 userId: bookingData.userId,

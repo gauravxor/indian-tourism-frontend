@@ -108,8 +108,10 @@ const SignUpModal = () => {
 
             setSignUpMessage("Signing Up...");
             try {
-                const url = `${window.location.protocol}//${window.location.hostname}:4000/api/auth/signup`;
-                const response = await axios.post(url, data);
+                const url = `${process.env.REACT_APP_API_BASE_URL}/api/auth/signup`;
+                const response = await axios.post(url, data, {
+                    withCredentials: true,
+                });
                 if (response.status === 201) {
                     setSignUpMessage("Signed Up Successfully!");
 

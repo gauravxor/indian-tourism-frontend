@@ -9,10 +9,12 @@ const DateSelector = (props) => {
 
     useEffect(() => {
         const fetchAvailabilityData = async () => {
-            const url = `${window.location.protocol}//${window.location.hostname}:4000/api/location/get-availability/${props.locationId}`;
+            const url = `${process.env.REACT_APP_API_BASE_URL}/api/location/get-availability/${props.locationId}`;
             var availabilityData;
             try {
-                const response = await axios.get(url);
+                const response = await axios.get(url, {
+                    withCredentials: true,
+                });
                 availabilityData =
                     response.data.data.availability.calendarMonths;
             } catch (error) {

@@ -12,7 +12,7 @@ const UserProfileEdit = (props) => {
         /** Fetching the location details from the API */
         async function fetchLocationDetails() {
             const url =
-                `${window.location.protocol}//${window.location.hostname}:4000/api/location/` +
+                `${process.env.REACT_APP_API_BASE_URL}/api/location/` +
                 locationId;
             try {
                 const response = await axios.get(url, {
@@ -94,7 +94,7 @@ const UserProfileEdit = (props) => {
 
         try {
             const url =
-                `${window.location.protocol}//${window.location.hostname}:4000/api/location/update-location/` +
+                `${process.env.REACT_APP_API_BASE_URL}/api/location/update-location/` +
                 locationId;
 
             /** Sending out request with appropriate multipart headers */

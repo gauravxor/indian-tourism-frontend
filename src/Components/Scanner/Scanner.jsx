@@ -8,14 +8,18 @@ const Scanner = () => {
 
     useEffect(() => {
         console.log("here");
-        const url = `${window.location.protocol}//${window.location.hostname}:4000/scanner/verify`;
+        const url = `${process.env.REACT_APP_API_BASE_URL}/scanner/verify`;
         const verifyAccessKey = async () => {
             var keyInput = prompt("Enter the access key");
             while (keyInput) {
                 try {
-                    const response = await axios.post(url, {
-                        accessKey: keyInput,
-                    });
+                    const response = await axios.post(
+                        url,
+                        {
+                            accessKey: keyInput,
+                        },
+                        { withCredentials: true }
+                    );
                     if (response.data.code === 200) {
                         setAccessKey(keyInput);
                         alert("Access Granted");
@@ -37,14 +41,16 @@ const Scanner = () => {
     const handleScan = async (data) => {
         if (data) {
             const bookingId = data.text;
-            const url = `${window.location.protocol}//${window.location.hostname}:4000/scanner/`;
+            const url = `${process.env.REACT_APP_API_BASE_URL}/scanner/`;
             data = {
                 accessKey: accessKey,
                 bookingId: bookingId,
             };
             setResult(" ");
             try {
-                const response = await axios.post(url, data);
+                const response = await axios.post(url, data, {
+                    withCredentials: true,
+                });
                 if (response.data.code === 200) {
                     setResult(response.data.data.bookingData);
                     setShowEntryModal(true);

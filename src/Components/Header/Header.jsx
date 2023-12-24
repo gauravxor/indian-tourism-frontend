@@ -35,10 +35,10 @@ const Header = () => {
         console.log("Logout Clicked");
 
         try {
-            const url = `${window.location.protocol}//${window.location.hostname}:4000/api/auth/logout`;
+            const url = `${process.env.REACT_APP_API_BASE_URL}/api/auth/logout`;
 
             /** Calling the Logout API */
-            const response = await axios.post(url, {
+            const response = await axios.post(url, null, {
                 withCredentials: true,
             });
             if (response.status === 204) {

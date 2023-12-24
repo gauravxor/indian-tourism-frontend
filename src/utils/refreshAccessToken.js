@@ -5,7 +5,7 @@ const tokenData = {
 };
 
 async function getAccessTokenExpiryEpoch() {
-    const url = `${window.location.protocol}//${window.location.hostname}:4000/api/token/expiry`;
+    const url = `${process.env.REACT_APP_API_BASE_URL}/api/token/expiry`;
     try {
         const response = await axios.get(url, { withCredentials: true });
         console.log(response);
@@ -26,9 +26,9 @@ async function rotateAuthTokens() {
         return false;
     }
 
-    const url = `${window.location.protocol}//${window.location.hostname}:4000/api/token`;
+    const url = `${process.env.REACT_APP_API_BASE_URL}/api/token`;
     try {
-        const response = await axios.post(url, { refreshToken });
+        const response = await axios.post(url, { refreshToken }, { withCredentials: true });
         if (!(response.data.code === 200)) {
             return false;
         }

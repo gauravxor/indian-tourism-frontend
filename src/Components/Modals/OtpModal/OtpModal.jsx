@@ -50,10 +50,12 @@ const OtpModal = () => {
         };
 
         try {
-            const url = `${window.location.protocol}//${window.location.hostname}:4000/api/auth/verify-otp`;
-            const response = await axios.post(url, data);
+            const url = `${process.env.REACT_APP_API_BASE_URL}/api/auth/verify-otp`;
+            const response = await axios.post(url, data, {
+                withCredentials: true,
+            });
             if (response.data.code === 200) {
-                console.log("OTP verified")
+                console.log("OTP verified");
                 setInfoMessage("Email verified");
                 setIsSubmitDisabled(false);
 
@@ -85,10 +87,12 @@ const OtpModal = () => {
             email: context.userEmail,
             otpType: "emailVerification",
         };
-        const url = `${window.location.protocol}//${window.location.hostname}:4000/api/auth/resend-otp`;
+        const url = `${process.env.REACT_APP_API_BASE_URL}/api/auth/resend-otp`;
 
         try {
-            const response = await axios.post(url, data);
+            const response = await axios.post(url, data, {
+                withCredentials: true,
+            });
             if (response.data.code === 200) {
                 setInfoMessage("New OTP sent");
                 setTimer(120);
