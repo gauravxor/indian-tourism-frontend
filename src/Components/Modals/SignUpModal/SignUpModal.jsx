@@ -123,7 +123,7 @@ const SignUpModal = () => {
                             isSignUpModalOpen: false,
                             isOtpModalOpen: true,
                             userEmail: email,
-                            userId: response.data.userId,
+                            userId: response.data.data.userId,
                         });
                     }, 2000);
                 }
